@@ -1,0 +1,84 @@
+---
+title: "Class 12 Lab Session"
+author: "Mikaela Joya (PID: A17295169)"
+format: pdf
+toc: true
+---
+
+# Section 1. Proportion of G/G in a population
+
+Downloaded a CSV file from Ensemble < https://www.ensembl.org/Homo_sapiens/Variation/Sample?db=core;r=17:39894595-39895595;v=rs8067378;vdb=variation;vf=959672880#373531_tablePanel >
+
+Here we read this CSV file
+
+```{r}
+mxl <- read.csv("373531-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378.csv")
+head(mxl)
+```
+```{r}
+table(mxl$Genotype..forward.strand.)
+```
+
+```{r}
+table(mxl$Genotype..forward.strand.) / nrow(mxl) * 100
+```
+
+Now let's look at a different population. I picked the GBR.
+
+```{r}
+gbr <- read.csv("373522-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378.csv")
+head(gbr)
+```
+
+Find proportion of G|G
+
+```{r}
+round(table(gbr$Genotype..forward.strand.) /nrow(gbr) * 100, 2 )
+```
+
+This variant that is associated with childhood asthma is more frequent in the GBR population than the MKL population.
+
+Let's now dig into this further.
+
+# Section 4: Population Scale Analysis
+
+> **Q13.** Read this file into R and determine the sample size for each genotype and their
+corresponding median expression levels for each of these genotypes.
+
+```{r}
+file <- "rs8067378_ENSG00000172057.6.txt"
+data <- read.table(file)
+
+colnames(data) <- c("sample", "genotype", "expression")
+
+head(data)
+```
+
+```{r}
+table(data$genotype)
+```
+
+The sample size for the A/A genotype is 108, the A/G genotype is 233, and G/G genotype is 121.
+
+```{r}
+tapply(data$expression, data$genotype, median)
+```
+
+The corresponding median expressions are 31.24847 (A/A), 25.06486 (A/G), and 20.07363 (G/G).
+
+> **Q14.**  Generate a boxplot with a box per genotype, what could you infer from the relative expression value between A/A and G/G displayed in this plot? Does the SNP effect the expression of ORMDL3?
+
+```{r}
+library(ggplot2)
+
+ggplot(data,
+       aes(x = genotype, y = expression, fill = genotype)) + 
+       geom_boxplot(notch = TRUE) + 
+       geom_jitter(width = 0.15, alpha = 0.5) +
+  labs(
+    title = "ORMDL3 Expression by Genotype",
+    x = "Genotype",
+    y = "Expression") +
+  theme_gray()
+```
+This boxplot shows that the A/A genotype individuals have higher expression levels of ORMDL3 compared to those with G/G. This means that the rs8067378 SNP affects the expression of the ORMDL3 gene because the G allele is associated with a decrease in gene expression.
