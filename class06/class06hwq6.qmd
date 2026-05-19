@@ -1,0 +1,48 @@
+---
+title: "HW Class 6 Q6 (R Functions)" 
+author: "Mikaela Joya (PID: A17295169)"
+format: pdf
+toc: TRUE
+---
+
+# **Q6.** How would you generalize the original code above to work with any set of input protein structures?
+
+The code could be generalized by writing a function that removes the repeated steps for each protein. This can be done by taking a PDB ID as an input. This function allows the PDB file to be read, trims the structure to the selected chain and atoms, extracts the B-factor values, and generates a plot for the specified proteins. Additionally, returning the B-factor vector allows the results to be used for more comparison or clustering.
+
+## Write your own function starting from the code above that analyzes protein drug interactions by reading in any protein PDB data and outputs a plot for the specified protein.
+
+The code given is generalized below:
+
+```{r}
+library(bio3d)
+```
+
+```{r}
+# analyze_protein() 
+# Input: 
+# pdb_id is a character string that represents PDB ID, 
+# chain_id is the protein chain used to analyze (default= "A"),
+# atom_type is the atom type to select (default= "CA")
+# Function: 
+# Reads the protein structure from the PDB database, 
+# trims to a specified chain and atom type,
+# Then it extracts the B-factor values and plots the B-factors
+# Output: Numeric vector with B-factor values for the selected atoms
+analyze_protein <- function(pdb_id, chain_id = "A", atom_type = "CA") {
+  pdb <- read.pdb(pdb_id)
+  pdb_trim <- trim.pdb(pdb, chain = chain_id, elety = atom_type)
+  b_factors <- pdb_trim$atom$b
+  
+  plotb3(b_factors, sse= pdb_trim, typ = "l", ylab = "Bfactor")
+  
+  return(b_factors)
+}
+```
+
+```{r}
+# Example usage
+s1.b <- analyze_protein("4AKE") # kinase with drug
+s2.b <- analyze_protein("1AKE") # kinase no drug
+s3.b <- analyze_protein("1E4Y") # kinase with drug
+```
+
